@@ -86,7 +86,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
         "           <td colspan='7' >" +
         "              <span    class='{{ data.currentView }}' " +
         "                       data-ng-repeat='dateValue in data.dates'  " +
-        "                       data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future}' " +
+        "                       data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future, now: dateValue.now}' " +
         "                       data-ng-click=\"changeView(data.nextView, dateValue.date, $event)\">{{ dateValue.display }}</span> " +
         "           </td>" +
         "       </tr>" +
@@ -94,7 +94,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
         "           <td data-ng-repeat='dateValue in week.dates' " +
         "               data-ng-click='changeView(data.nextView, dateValue.date, $event)'" +
         "               class='day' " +
-        "               data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future}' >{{ dateValue.display }}</td>" +
+        "               data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future, now: dateValue.now}' >{{ dateValue.display }}</td>" +
         "       </tr>" +
         "   </tbody>" +
         "</table></div>",
@@ -117,6 +117,14 @@ angular.module('ui.bootstrap.datetimepicker', [])
 
         validateConfiguration(configuration);
 
+        var now = function(){
+          var nowMoment = moment().utc();
+          var offset = nowMoment.toDate().getTimezoneOffset();
+
+          // Offset current time by timezone, to align with UTC-based UI
+          return nowMoment.subtract(offset, 'minute');
+        }
+
         var dataFactory = {
           year: function (unixDate) {
             var selectedDate = moment.utc(unixDate).startOf('year');
@@ -126,6 +134,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
             var startDecade = (parseInt(selectedDate.year() / 10, 10) * 10);
             var startDate = moment.utc(selectedDate).year(startDecade - 1).startOf('year');
             var activeYear = scope.ngModel ? moment(scope.ngModel).year() : 0;
+            var nowMoment = now();
 
             var result = {
               'currentView': 'year',
@@ -143,7 +152,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
                 'display': yearMoment.format('YYYY'),
                 'past': yearMoment.year() < startDecade,
                 'future': yearMoment.year() > startDecade + 9,
-                'active': yearMoment.year() === activeYear
+                'active': yearMoment.year() === activeYear,
+                'now': yearMoment.isSame(nowMoment, 'year')
               };
 
               result.dates.push(dateValue);
@@ -153,10 +163,11 @@ angular.module('ui.bootstrap.datetimepicker', [])
           },
 
           month: function (unixDate) {
-
             var startDate = moment.utc(unixDate).startOf('year');
 
             var activeDate = scope.ngModel ? moment(scope.ngModel).format('YYYY-MMM') : 0;
+
+            var nowMoment = now();
 
             var result = {
               'previousView': 'year',
@@ -174,7 +185,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
               var dateValue = {
                 'date': monthMoment.valueOf(),
                 'display': monthMoment.format('MMM'),
-                'active': monthMoment.format('YYYY-MMM') === activeDate
+                'active': monthMoment.format('YYYY-MMM') === activeDate,
+                'now': monthMoment.isSame(nowMoment, 'month')
               };
 
               result.dates.push(dateValue);
@@ -192,6 +204,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
             var startDate = moment.utc(startOfMonth).subtract(Math.abs(startOfMonth.weekday()), 'days');
 
             var activeDate = scope.ngModel ? moment(scope.ngModel).format('YYYY-MMM-DD') : '';
+
+            var nowMoment = now();
 
             var result = {
               'previousView': 'month',
@@ -219,7 +233,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
                   'display': monthMoment.format('D'),
                   'active': monthMoment.format('YYYY-MMM-DD') === activeDate,
                   'past': monthMoment.isBefore(startOfMonth),
-                  'future': monthMoment.isAfter(endOfMonth)
+                  'future': monthMoment.isAfter(endOfMonth),
+                  'now': monthMoment.isSame(nowMoment, 'day')
                 };
                 week.dates.push(dateValue);
               }
@@ -233,6 +248,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
             var selectedDate = moment.utc(unixDate).hour(0).minute(0).second(0);
 
             var activeFormat = scope.ngModel ? moment(scope.ngModel).format('YYYY-MM-DD H') : '';
+
+            var nowMoment = now();
 
             var result = {
               'previousView': 'day',
@@ -250,7 +267,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
               var dateValue = {
                 'date': hourMoment.valueOf(),
                 'display': hourMoment.format('LT'),
-                'active': hourMoment.format('YYYY-MM-DD H') === activeFormat
+                'active': hourMoment.format('YYYY-MM-DD H') === activeFormat,
+                'now': hourMoment.isSame(nowMoment, 'hour')
               };
 
               result.dates.push(dateValue);
@@ -263,6 +281,9 @@ angular.module('ui.bootstrap.datetimepicker', [])
             var selectedDate = moment.utc(unixDate).minute(0).second(0);
 
             var activeFormat = scope.ngModel ? moment(scope.ngModel).format('YYYY-MM-DD H:mm') : '';
+
+            var nowMoment = now();
+            nowMoment.subtract(nowMoment.minute() % configuration.minuteStep, 'minute');
 
             var result = {
               'previousView': 'hour',
@@ -282,7 +303,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
               var dateValue = {
                 'date': hourMoment.valueOf(),
                 'display': hourMoment.format('LT'),
-                'active': hourMoment.format('YYYY-MM-DD H:mm') === activeFormat
+                'active': hourMoment.format('YYYY-MM-DD H:mm') === activeFormat,
+                'now': hourMoment.isSame(nowMoment, 'minute')
               };
 
               result.dates.push(dateValue);

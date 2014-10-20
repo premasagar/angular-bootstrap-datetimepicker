@@ -162,6 +162,12 @@
     cursor: pointer;
 }
 
+.datetimepicker table tr td.now,
+.datetimepicker table tr td span.now {
+    outline: 1px solid #ddd;
+}
+
+
 .datetimepicker table tr td.past,
 .datetimepicker table tr td.future {
     color: #999999;
