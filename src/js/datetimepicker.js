@@ -83,7 +83,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
         "   </thead>" +
         "   <tbody>" +
         "       <tr data-ng-class='{ hide: data.currentView == \"day\" }' >" +
-        "           <td colspan='7' >" +
+        "           <td colspan='7'>" +
         "              <span    class='{{ data.currentView }}' " +
         "                       data-ng-repeat='dateValue in data.dates'  " +
         "                       data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future, now: dateValue.now}' " +
@@ -95,6 +95,11 @@ angular.module('ui.bootstrap.datetimepicker', [])
         "               data-ng-click='changeView(data.nextView, dateValue.date, $event)'" +
         "               class='day' " +
         "               data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future, now: dateValue.now}' >{{ dateValue.display }}</td>" +
+        "       </tr>" +
+        "       <tr>" +
+        "         <td colspan='7' data-ng-click=\"today($event)\">" +
+        "           <button class='today'>Today</button>" +
+        "         </td>" +
         "       </tr>" +
         "   </tbody>" +
         "</table></div>",
@@ -332,6 +337,10 @@ angular.module('ui.bootstrap.datetimepicker', [])
         var getUTCTime = function () {
           var tempDate = (scope.ngModel ? moment(scope.ngModel).toDate() : new Date());
           return tempDate.getTime() - (tempDate.getTimezoneOffset() * 60000);
+        };
+
+        scope.today = function (event) {
+          scope.changeView('hour', getUTCTime(), event);
         };
 
         scope.changeView = function (viewName, unixDate, event) {
