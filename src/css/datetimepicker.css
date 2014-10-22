@@ -162,10 +162,15 @@
     cursor: pointer;
 }
 
-.datetimepicker tr.today button {
+.datetimepicker button.now {
     background: none;
     border: none;
     width: 100%;
+    margin-top: 8px;
+}
+
+.datetimepicker button.now[disabled] {
+    color: #999999;
 }
 
 
@@ -204,7 +209,7 @@
 .datetimepicker table tr td.today:hover,
 .datetimepicker table tr td.today:hover:hover,
 .datetimepicker table tr td.today.disabled:hover,
-.datetimepicker table tr td.today.disabled:hover:hover,
+.datetimepicker table tr td.today.disabled:hover,
 .datetimepicker table tr td.today:active,
 .datetimepicker table tr td.today:hover:active,
 .datetimepicker table tr td.today.disabled:active,
