@@ -235,7 +235,7 @@
 .datetimepicker table tr td.today.disabled:hover.active,
 .datetimepicker table tr td.now:active,
 .datetimepicker table tr td span.now:active {
-    background-color: #fbf069 \9;
+    background-color: #fbf069;
 }
 
 .datetimepicker table tr td.active,
@@ -289,7 +289,7 @@
 .datetimepicker table tr td.active:hover.active,
 .datetimepicker table tr td.active.disabled.active,
 .datetimepicker table tr td.active.disabled:hover.active {
-    background-color: #003399 \9;
+    background-color: #003399;
 }
 
 .datetimepicker table tr td span {
@@ -377,7 +377,7 @@
 .datetimepicker table tr td span.active:hover.active,
 .datetimepicker table tr td span.active.disabled.active,
 .datetimepicker table tr td span.active.disabled:hover.active {
-    background-color: #003399 \9;
+    background-color: #003399;
 }
 
 .datetimepicker table tr td span.past,
