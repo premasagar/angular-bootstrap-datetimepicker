@@ -18,13 +18,17 @@ angular.module('ui.bootstrap.datetimepicker', [])
     dropdownSelector: null,
     minuteStep: 5,
     minView: 'minute',
-    startView: 'day'
+    startView: 'day',
+    now: 'D', // Any combination of Y, M, D, H, m, or null
+    today: true,
+    todayText: 'Today', // "Today" button text
+    todayView: 'hour' // View to go to when "Today" button clicked
   })
   .directive('datetimepicker', ['dateTimePickerConfig', function (defaultConfig) {
     "use strict";
 
     var validateConfiguration = function (configuration) {
-      var validOptions = ['startView', 'minView', 'minuteStep', 'dropdownSelector'];
+      var validOptions = ['startView', 'minView', 'minuteStep', 'dropdownSelector', 'now', 'today', 'todayText', 'todayView'];
 
       for (var prop in configuration) {
         if (configuration.hasOwnProperty(prop)) {
@@ -57,6 +61,12 @@ angular.module('ui.bootstrap.datetimepicker', [])
       }
       if (configuration.dropdownSelector !== null && !angular.isString(configuration.dropdownSelector)) {
         throw ("dropdownSelector must be a string");
+      }
+      if (configuration.now !== null && !angular.isString(configuration.now)){
+        throw ("now must be a string");
+      }
+      if (configuration.today !== null && !angular.isString(configuration.now)){
+        throw ("today must be a string");
       }
     };
 
@@ -96,9 +106,9 @@ angular.module('ui.bootstrap.datetimepicker', [])
         "               class='day' " +
         "               data-ng-class='{active: dateValue.active, past: dateValue.past, future: dateValue.future, now: dateValue.now}' >{{ dateValue.display }}</td>" +
         "       </tr>" +
-        "       <tr>" +
-        "         <td colspan='7' data-ng-click=\"today($event)\">" +
-        "           <button class='today'>Today</button>" +
+        "       <tr class='today' data-ng-show='data.today'>" +
+        "         <td colspan='7' data-ng-class='{disabled: data.todayDisabled}' data-ng-click='today($event)'>" +
+        "           <button data-ng-disabled='data.todayDisabled'>{{ data.today }}</button>" +
         "         </td>" +
         "       </tr>" +
         "   </tbody>" +
@@ -139,6 +149,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
             var startDecade = (parseInt(selectedDate.year() / 10, 10) * 10);
             var startDate = moment.utc(selectedDate).year(startDecade - 1).startOf('year');
             var activeYear = scope.ngModel ? moment(scope.ngModel).year() : 0;
+
             var nowMoment = now();
 
             var result = {
@@ -147,7 +158,8 @@ angular.module('ui.bootstrap.datetimepicker', [])
               'title': startDecade + '-' + (startDecade + 9),
               'leftDate': moment.utc(startDate).subtract(9, 'year').valueOf(),
               'rightDate': moment.utc(startDate).add(11, 'year').valueOf(),
-              'dates': []
+              'dates': [],
+              'today': configuration.today && configuration.todayText
             };
 
             for (var i = 0; i < 12; i++) {
@@ -174,6 +186,10 @@ angular.module('ui.bootstrap.datetimepicker', [])
 
             var nowMoment = now();
 
+            var includesNow = startDate.isSame(nowMoment, 'year');
+
+            var todayDisabled = configuration.today && configuration.todayView === 'month' && includesNow;
+
             var result = {
               'previousView': 'year',
               'currentView': 'month',
@@ -182,7 +198,9 @@ angular.module('ui.bootstrap.datetimepicker', [])
               'title': startDate.format('YYYY'),
               'leftDate': moment.utc(startDate).subtract(1, 'year').valueOf(),
               'rightDate': moment.utc(startDate).add(1, 'year').valueOf(),
-              'dates': []
+              'dates': [],
+              'today': configuration.today && configuration.todayText,
+              'todayDisabled': todayDisabled
             };
 
             for (var i = 0; i < 12; i++) {
@@ -191,7 +209,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
                 'date': monthMoment.valueOf(),
                 'display': monthMoment.format('MMM'),
                 'active': monthMoment.format('YYYY-MMM') === activeDate,
-                'now': monthMoment.isSame(nowMoment, 'month')
+                'now': includesNow && monthMoment.isSame(nowMoment, 'month')
               };
 
               result.dates.push(dateValue);
@@ -212,6 +230,10 @@ angular.module('ui.bootstrap.datetimepicker', [])
 
             var nowMoment = now();
 
+            var includesNow = selectedDate.isSame(nowMoment, 'month');
+
+            var todayDisabled = configuration.today && configuration.todayView === 'day' && includesNow;
+
             var result = {
               'previousView': 'month',
               'currentView': 'day',
@@ -221,7 +243,9 @@ angular.module('ui.bootstrap.datetimepicker', [])
               'leftDate': moment.utc(startOfMonth).subtract(1, 'months').valueOf(),
               'rightDate': moment.utc(startOfMonth).add(1, 'months').valueOf(),
               'dayNames': [],
-              'weeks': []
+              'weeks': [],
+              'today': configuration.today && configuration.todayText,
+              'todayDisabled': todayDisabled
             };
 
 
@@ -239,7 +263,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
                   'active': monthMoment.format('YYYY-MMM-DD') === activeDate,
                   'past': monthMoment.isBefore(startOfMonth),
                   'future': monthMoment.isAfter(endOfMonth),
-                  'now': monthMoment.isSame(nowMoment, 'day')
+                  'now': includesNow && monthMoment.isSame(nowMoment, 'day')
                 };
                 week.dates.push(dateValue);
               }
@@ -256,6 +280,10 @@ angular.module('ui.bootstrap.datetimepicker', [])
 
             var nowMoment = now();
 
+            var includesNow = selectedDate.isSame(nowMoment, 'day');
+
+            var todayDisabled = configuration.today && configuration.todayView === 'hour' && includesNow;
+
             var result = {
               'previousView': 'day',
               'currentView': 'hour',
@@ -264,7 +292,9 @@ angular.module('ui.bootstrap.datetimepicker', [])
               'title': selectedDate.format('ll'),
               'leftDate': moment.utc(selectedDate).subtract(1, 'days').valueOf(),
               'rightDate': moment.utc(selectedDate).add(1, 'days').valueOf(),
-              'dates': []
+              'dates': [],
+              'today': configuration.today && configuration.todayText,
+              'todayDisabled': todayDisabled
             };
 
             for (var i = 0; i < 24; i++) {
@@ -273,7 +303,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
                 'date': hourMoment.valueOf(),
                 'display': hourMoment.format('LT'),
                 'active': hourMoment.format('YYYY-MM-DD H') === activeFormat,
-                'now': hourMoment.isSame(nowMoment, 'hour')
+                'now': includesNow && hourMoment.isSame(nowMoment, 'hour')
               };
 
               result.dates.push(dateValue);
@@ -290,6 +320,10 @@ angular.module('ui.bootstrap.datetimepicker', [])
             var nowMoment = now();
             nowMoment.subtract(nowMoment.minute() % configuration.minuteStep, 'minute');
 
+            var includesNow = selectedDate.isSame(nowMoment, 'hour');
+
+            var todayDisabled = configuration.today && configuration.todayView === 'minute' && includesNow;
+
             var result = {
               'previousView': 'hour',
               'currentView': 'minute',
@@ -298,7 +332,9 @@ angular.module('ui.bootstrap.datetimepicker', [])
               'title': selectedDate.format('lll'),
               'leftDate': moment.utc(selectedDate).subtract(1, 'hours').valueOf(),
               'rightDate': moment.utc(selectedDate).add(1, 'hours').valueOf(),
-              'dates': []
+              'dates': [],
+              'today': configuration.today && configuration.todayText,
+              'todayDisabled': todayDisabled
             };
 
             var limit = 60 / configuration.minuteStep;
@@ -309,7 +345,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
                 'date': hourMoment.valueOf(),
                 'display': hourMoment.format('LT'),
                 'active': hourMoment.format('YYYY-MM-DD H:mm') === activeFormat,
-                'now': hourMoment.isSame(nowMoment, 'minute')
+                'now': includesNow && hourMoment.isSame(nowMoment, 'minute')
               };
 
               result.dates.push(dateValue);
@@ -340,7 +376,7 @@ angular.module('ui.bootstrap.datetimepicker', [])
         };
 
         scope.today = function (event) {
-          scope.changeView('hour', getUTCTime(), event);
+          scope.changeView(configuration.todayView, getUTCTime(), event);
         };
 
         scope.changeView = function (viewName, unixDate, event) {

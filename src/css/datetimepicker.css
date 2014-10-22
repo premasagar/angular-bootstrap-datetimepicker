@@ -162,9 +162,10 @@
     cursor: pointer;
 }
 
-.datetimepicker button.today {
+.datetimepicker tr.today button {
     background: none;
     border: none;
+    width: 100%;
 }
 
 
