@@ -162,11 +162,6 @@
     cursor: pointer;
 }
 
-.datetimepicker table tr td.now,
-.datetimepicker table tr td span.now {
-    outline: 1px solid #ddd;
-}
-
 .datetimepicker button.today {
     background: none;
     border: none;
@@ -188,7 +183,9 @@
 .datetimepicker table tr td.today,
 .datetimepicker table tr td.today:hover,
 .datetimepicker table tr td.today.disabled,
-.datetimepicker table tr td.today.disabled:hover {
+.datetimepicker table tr td.today.disabled:hover,
+.datetimepicker table tr td.now,
+.datetimepicker table tr td span.now {
     background-color: #fde19a;
     background-image: -moz-linear-gradient(top, #fdd49a, #fdf59a);
     background-image: -ms-linear-gradient(top, #fdd49a, #fdf59a);
@@ -222,7 +219,9 @@
 .datetimepicker table tr td.today[disabled],
 .datetimepicker table tr td.today:hover[disabled],
 .datetimepicker table tr td.today.disabled[disabled],
-.datetimepicker table tr td.today.disabled:hover[disabled] {
+.datetimepicker table tr td.today.disabled:hover[disabled],
+.datetimepicker table tr td.now:hover,
+.datetimepicker table tr td span.now:hover {
     background-color: #fdf59a;
 }
 
@@ -233,7 +232,9 @@
 .datetimepicker table tr td.today.active,
 .datetimepicker table tr td.today:hover.active,
 .datetimepicker table tr td.today.disabled.active,
-.datetimepicker table tr td.today.disabled:hover.active {
+.datetimepicker table tr td.today.disabled:hover.active,
+.datetimepicker table tr td.now:active,
+.datetimepicker table tr td span.now:active {
     background-color: #fbf069 \9;
 }
 
