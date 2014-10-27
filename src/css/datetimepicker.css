@@ -173,6 +173,14 @@
     color: #999999;
 }
 
+.datetimepicker button.now:hover:not([disabled]) {
+    background: #eeeeee;
+}
+
+.datetimepicker button.now:active {
+    background: #fde19a;
+}
+
 
 .datetimepicker table tr td.past,
 .datetimepicker table tr td.future {
